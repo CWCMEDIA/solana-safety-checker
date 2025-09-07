@@ -7,7 +7,6 @@ import os
 import sys
 import json
 import base64
-from http.server import BaseHTTPRequestHandler
 from io import BytesIO
 
 # Add the parent directory to the path to import our modules
@@ -17,27 +16,14 @@ from sol_safety_check.cli import fetch_all_data, assess_token_risk
 from sol_safety_check.utils import validate_solana_address
 from sol_safety_check.datasources.dexscreener import DexScreenerClient
 
-# Password protection disabled for public deployment
-# SITE_PASSWORD = "LetsHope"
-
 class VercelHandler:
-    def __init__(self, request, client_address, server=None):
+    def __init__(self, request):
         self.request = request
-        self.client_address = client_address
-        self.server = server
         self.rfile = BytesIO(request.get('body', b''))
         self.wfile = BytesIO()
         self.headers = request.get('headers', {})
         self.path = request.get('path', '/')
         self.command = request.get('method', 'GET')
-    
-    def check_auth(self):
-        """Check if user is authenticated - disabled for public deployment"""
-        return True  # Always return True to bypass authentication
-    
-    def require_auth(self):
-        """Require authentication for protected pages - disabled for public deployment"""
-        return None  # Always return None to bypass authentication
     
     def serve_index(self):
         """Serve the main HTML page"""
@@ -162,7 +148,6 @@ class VercelHandler:
     
     def serve_css(self):
         """Serve CSS styles"""
-        # Return a simplified CSS for Vercel
         css = '''
         body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .container { max-width: 1200px; margin: 0 auto; }
@@ -200,25 +185,16 @@ class VercelHandler:
         let currentTab = 'trending';
         
         function switchTab(tabName) {
-            // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
-            
-            // Remove active class from all buttons
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            
-            // Show selected tab
             document.getElementById(tabName).classList.add('active');
-            
-            // Add active class to clicked button
             event.target.classList.add('active');
-            
             currentTab = tabName;
             
-            // Load data for the tab
             if (tabName === 'trending') {
                 loadTrendingCoins();
             } else if (tabName === 'latest') {
@@ -398,7 +374,6 @@ class VercelHandler:
             `;
         }
         
-        // Load trending coins on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadTrendingCoins();
         });
@@ -538,12 +513,7 @@ class VercelHandler:
 def handler(request):
     """Vercel serverless function handler"""
     try:
-        handler_instance = VercelHandler(request, None)
-        
-        # Check authentication first
-        auth_result = handler_instance.require_auth()
-        if auth_result:
-            return auth_result
+        handler_instance = VercelHandler(request)
         
         # Route the request
         if request.get('method') == 'GET':
