@@ -1,6 +1,22 @@
-module.exports = (req, res) => {
-  res.status(200).send(`
-<!DOCTYPE html>
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+
+const server = http.createServer((req, res) => {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+
+  // Serve the main page
+  if (req.url === '/' || req.url === '/index.html') {
+    const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -145,6 +161,7 @@ module.exports = (req, res) => {
         }
         
         function loadTrendingCoins() {
+            // Mock data for testing
             const mockCoins = [
                 {
                     address: 'So11111111111111111111111111111111111111112',
@@ -171,6 +188,7 @@ module.exports = (req, res) => {
         }
         
         function loadLatestCoins() {
+            // Mock data for testing
             const mockCoins = [
                 {
                     address: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
@@ -279,6 +297,7 @@ module.exports = (req, res) => {
                 return;
             }
             
+            // Mock analysis for testing
             const resultsDiv = document.getElementById('analysis-results');
             resultsDiv.style.display = 'block';
             
@@ -304,6 +323,19 @@ module.exports = (req, res) => {
         });
     </script>
 </body>
-</html>
-`);
-};
+</html>`;
+
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(html);
+  } else {
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Not Found');
+  }
+});
+
+const PORT = 3000;
+server.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log('📱 Open your browser and go to the URL above');
+  console.log('🛑 Press Ctrl+C to stop the server');
+});
