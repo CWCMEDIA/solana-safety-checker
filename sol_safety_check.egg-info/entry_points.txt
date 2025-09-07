@@ -1,0 +1,3 @@
+[console_scripts]
+sol-safety-check = sol_safety_check.cli:app
+

@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: sol-safety-check
+Version: 0.1.0
+Summary: A comprehensive Solana token safety checker CLI tool
+Home-page: UNKNOWN
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.9
+
+UNKNOWN
+
