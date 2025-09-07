@@ -20,7 +20,7 @@ from sol_safety_check.datasources.dexscreener import DexScreenerClient
 # Password protection
 SITE_PASSWORD = "LetsHope"
 
-class VercelHandler(BaseHTTPRequestHandler):
+class VercelHandler:
     def __init__(self, request, client_address, server=None):
         self.request = request
         self.client_address = client_address
@@ -563,45 +563,52 @@ class VercelHandler(BaseHTTPRequestHandler):
 
 def handler(request):
     """Vercel serverless function handler"""
-    handler_instance = VercelHandler(request, None)
-    
-    # Check authentication first
-    auth_result = handler_instance.require_auth()
-    if auth_result:
-        return auth_result
-    
-    # Route the request
-    if request.get('method') == 'GET':
-        path = request.get('path', '/')
-        if path == '/':
-            return handler_instance.serve_index()
-        elif path == '/style.css':
-            return handler_instance.serve_css()
-        elif path == '/script.js':
-            return handler_instance.serve_js()
-        elif path == '/trending':
-            return handler_instance.get_trending_coins()
-        elif path == '/latest':
-            return handler_instance.get_latest_coins()
+    try:
+        handler_instance = VercelHandler(request, None)
+        
+        # Check authentication first
+        auth_result = handler_instance.require_auth()
+        if auth_result:
+            return auth_result
+        
+        # Route the request
+        if request.get('method') == 'GET':
+            path = request.get('path', '/')
+            if path == '/':
+                return handler_instance.serve_index()
+            elif path == '/style.css':
+                return handler_instance.serve_css()
+            elif path == '/script.js':
+                return handler_instance.serve_js()
+            elif path == '/trending':
+                return handler_instance.get_trending_coins()
+            elif path == '/latest':
+                return handler_instance.get_latest_coins()
+            else:
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'text/plain'},
+                    'body': 'Not Found'
+                }
+        elif request.get('method') == 'POST':
+            path = request.get('path', '/')
+            if path == '/analyze':
+                return handler_instance.analyze_token()
+            else:
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'text/plain'},
+                    'body': 'Not Found'
+                }
         else:
             return {
-                'statusCode': 404,
+                'statusCode': 405,
                 'headers': {'Content-Type': 'text/plain'},
-                'body': 'Not Found'
+                'body': 'Method Not Allowed'
             }
-    elif request.get('method') == 'POST':
-        path = request.get('path', '/')
-        if path == '/analyze':
-            return handler_instance.analyze_token()
-        else:
-            return {
-                'statusCode': 404,
-                'headers': {'Content-Type': 'text/plain'},
-                'body': 'Not Found'
-            }
-    else:
+    except Exception as e:
         return {
-            'statusCode': 405,
+            'statusCode': 500,
             'headers': {'Content-Type': 'text/plain'},
-            'body': 'Method Not Allowed'
+            'body': f'Internal Server Error: {str(e)}'
         }
