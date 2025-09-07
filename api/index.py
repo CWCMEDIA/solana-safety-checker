@@ -17,8 +17,8 @@ from sol_safety_check.cli import fetch_all_data, assess_token_risk
 from sol_safety_check.utils import validate_solana_address
 from sol_safety_check.datasources.dexscreener import DexScreenerClient
 
-# Password protection
-SITE_PASSWORD = "LetsHope"
+# Password protection disabled for public deployment
+# SITE_PASSWORD = "LetsHope"
 
 class VercelHandler:
     def __init__(self, request, client_address, server=None):
@@ -32,38 +32,12 @@ class VercelHandler:
         self.command = request.get('method', 'GET')
     
     def check_auth(self):
-        """Check if user is authenticated"""
-        auth_header = self.headers.get('authorization', '')
-        if auth_header and auth_header.startswith('Basic '):
-            try:
-                encoded = auth_header.split(' ')[1]
-                decoded = base64.b64decode(encoded).decode('utf-8')
-                username, password = decoded.split(':', 1)
-                return password == SITE_PASSWORD
-            except:
-                return False
-        return False
+        """Check if user is authenticated - disabled for public deployment"""
+        return True  # Always return True to bypass authentication
     
     def require_auth(self):
-        """Require authentication for protected pages"""
-        if not self.check_auth():
-            return {
-                'statusCode': 401,
-                'headers': {
-                    'WWW-Authenticate': 'Basic realm="Solana Safety Checker"',
-                    'Content-Type': 'text/html'
-                },
-                'body': '''
-                <html>
-                <head><title>Authentication Required</title></head>
-                <body>
-                    <h1>Authentication Required</h1>
-                    <p>Please enter the password to access this site.</p>
-                </body>
-                </html>
-                '''
-            }
-        return None
+        """Require authentication for protected pages - disabled for public deployment"""
+        return None  # Always return None to bypass authentication
     
     def serve_index(self):
         """Serve the main HTML page"""
