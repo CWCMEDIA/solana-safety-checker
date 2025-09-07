@@ -194,7 +194,9 @@ module.exports = (req, res) => {
                 return;
             }
             
-            const html = coins.map(coin => {
+            let html = '';
+            for (let i = 0; i < coins.length; i++) {
+                const coin = coins[i];
                 let mainTitle, subtitle;
                 
                 if (coin.name && coin.name.length > 0 && coin.name !== coin.symbol) {
@@ -205,36 +207,36 @@ module.exports = (req, res) => {
                     subtitle = '';
                 }
                 
-                return \`
-                <div class="coin-card" onclick="analyzeCoin('\${coin.address}')">
-                    <div class="coin-header">
-                        <div class="coin-symbol">\${mainTitle}</div>
-                        <div class="coin-price">$\${formatPrice(coin.price)}</div>
-                    </div>
-                    \${subtitle ? \`<div class="coin-name">\${subtitle}</div>\` : ''}
-                    <div class="coin-stats">
-                        <div class="stat">
-                            <div class="stat-label">24h Change</div>
-                            <div class="stat-value \${coin.change24h >= 0 ? 'change-positive' : 'change-negative'}">
-                                \${coin.change24h >= 0 ? '+' : ''}\${coin.change24h.toFixed(2)}%
-                            </div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Volume 24h</div>
-                            <div class="stat-value">$\${formatNumber(coin.volume24h)}</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Liquidity</div>
-                            <div class="stat-value">$\${formatNumber(coin.liquidity)}</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">\${coin.age ? 'Age' : 'Address'}</div>
-                            <div class="stat-value">\${coin.age || coin.address.substring(0, 8) + '...'}</div>
-                        </div>
-                    </div>
-                </div>
-                \`;
-            }).join('');
+                html += '<div class="coin-card" onclick="analyzeCoin(\\'' + coin.address + '\\')">';
+                html += '<div class="coin-header">';
+                html += '<div class="coin-symbol">' + mainTitle + '</div>';
+                html += '<div class="coin-price">$' + formatPrice(coin.price) + '</div>';
+                html += '</div>';
+                if (subtitle) {
+                    html += '<div class="coin-name">' + subtitle + '</div>';
+                }
+                html += '<div class="coin-stats">';
+                html += '<div class="stat">';
+                html += '<div class="stat-label">24h Change</div>';
+                html += '<div class="stat-value ' + (coin.change24h >= 0 ? 'change-positive' : 'change-negative') + '">';
+                html += (coin.change24h >= 0 ? '+' : '') + coin.change24h.toFixed(2) + '%';
+                html += '</div>';
+                html += '</div>';
+                html += '<div class="stat">';
+                html += '<div class="stat-label">Volume 24h</div>';
+                html += '<div class="stat-value">$' + formatNumber(coin.volume24h) + '</div>';
+                html += '</div>';
+                html += '<div class="stat">';
+                html += '<div class="stat-label">Liquidity</div>';
+                html += '<div class="stat-value">$' + formatNumber(coin.liquidity) + '</div>';
+                html += '</div>';
+                html += '<div class="stat">';
+                html += '<div class="stat-label">' + (coin.age ? 'Age' : 'Address') + '</div>';
+                html += '<div class="stat-value">' + (coin.age || coin.address.substring(0, 8) + '...') + '</div>';
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+            }
             
             container.innerHTML = html;
         }
@@ -282,26 +284,25 @@ module.exports = (req, res) => {
             const resultsDiv = document.getElementById('analysis-results');
             resultsDiv.style.display = 'block';
             
-            resultsDiv.innerHTML = \`
-                <div class="analysis-results">
-                    <h3>Analysis Results</h3>
-                    <div class="risk-score" style="color: #28a745">
-                        Risk Score: 25/100
-                    </div>
-                    <div class="verdict" style="color: #28a745">
-                        Low Risk
-                    </div>
-                    <div class="summary">
-                        <h4>Summary</h4>
-                        <p>This token appears to be safe based on initial analysis. (Mock data for testing)</p>
-                    </div>
-                </div>
-            \`;
+            resultsDiv.innerHTML = '<div class="analysis-results">' +
+                '<h3>Analysis Results</h3>' +
+                '<div class="risk-score" style="color: #28a745">' +
+                'Risk Score: 25/100' +
+                '</div>' +
+                '<div class="verdict" style="color: #28a745">' +
+                'Low Risk' +
+                '</div>' +
+                '<div class="summary">' +
+                '<h4>Summary</h4>' +
+                '<p>This token appears to be safe based on initial analysis. (Mock data for testing)</p>' +
+                '</div>' +
+                '</div>';
         }
         
-        document.addEventListener('DOMContentLoaded', function() {
+        // Load trending coins immediately when page loads
+        window.onload = function() {
             loadTrendingCoins();
-        });
+        };
     </script>
 </body>
 </html>
